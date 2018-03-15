@@ -34,6 +34,32 @@ function catchErrors(fn) {
   return (req, res, next) => fn(req, res, next).catch(next);
 }
 
+function indexRoute(req, res) {
+  return res.json({
+    authentication: {
+      register: '/register',
+      login: '/login',
+    },
+    books: {
+      books: '/books',
+      book: '/book/{id}',
+    },
+    categories: '/categories',
+    users: {
+      users: '/users',
+      user: '/users/{id}',
+      read: '/users/{id}/read',
+    },
+    me: {
+      me: '/users/me',
+      profile: '/users/me/profile',
+      read: '/users/me/read',
+    },
+  });
+}
+
+router.get('/', indexRoute);
+
 router.get('/users', requireAuth, catchErrors(usersRoute));
 router.get('/users/me', requireAuth, catchErrors(meRoute));
 router.get('/users/:id', requireAuth, catchErrors(userRoute));
