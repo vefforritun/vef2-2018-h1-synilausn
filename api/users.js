@@ -1,8 +1,11 @@
 const cloudinary = require('cloudinary');
+const multer = require('multer');
 
 const { findById, updateUser } = require('../users');
 const { query, paged } = require('../db');
 const { validateUser } = require('../validation');
+
+const uploads = multer({ dest: './temp' });
 
 const {
   CLOUDINARY_CLOUD,
@@ -107,6 +110,10 @@ async function meProfileRoute(req, res, next) {
   try {
     upload = await cloudinary.v2.uploader.upload(path);
   } catch (error) {
+    if (error.http_code && error.http_code === 400) {
+      return res.status(400).json({ error: error.message });
+    }
+
     console.error('Unable to upload file to cloudinary:', path);
     return next(error);
   }
@@ -121,10 +128,24 @@ async function meProfileRoute(req, res, next) {
   return res.status(201).json(row);
 }
 
+async function meProfileRouteWithMulter(req, res, next) {
+  uploads.single('profile')(req, res, (err) => {
+    if (err) {
+      if (err.message === 'Unexpected field') {
+        return res.status(400).json({ error: 'Unable to read image' });
+      }
+
+      return next(err);
+    }
+
+    return meProfileRoute(req, res, next);
+  });
+}
+
 module.exports = {
   usersRoute,
   userRoute,
   meRoute,
   mePatchRoute,
-  meProfileRoute,
+  meProfileRouteWithMulter,
 };

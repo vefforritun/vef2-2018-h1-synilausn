@@ -1,8 +1,5 @@
 const express = require('express');
 const { requireAuth } = require('../auth');
-const multer = require('multer');
-
-const uploads = multer({ dest: './temp' });
 
 const router = express.Router();
 
@@ -20,7 +17,7 @@ const {
   userRoute,
   meRoute,
   mePatchRoute,
-  meProfileRoute,
+  meProfileRouteWithMulter,
 } = require('./users');
 
 const {
@@ -64,7 +61,7 @@ router.get('/users', requireAuth, catchErrors(usersRoute));
 router.get('/users/me', requireAuth, catchErrors(meRoute));
 router.get('/users/:id', requireAuth, catchErrors(userRoute));
 router.patch('/users/me', requireAuth, catchErrors(mePatchRoute));
-router.post('/users/me/profile', requireAuth, uploads.single('profile'), catchErrors(meProfileRoute));
+router.post('/users/me/profile', requireAuth, catchErrors(meProfileRouteWithMulter));
 router.get('/categories', catchErrors(categoriesRoute));
 router.post('/categories', requireAuth, catchErrors(categoriesPostRoute));
 router.get('/books', catchErrors(booksRoute));
