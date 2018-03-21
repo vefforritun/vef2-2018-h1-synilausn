@@ -85,7 +85,7 @@ async function mePatchRoute(req, res) {
   }
 
   delete result.password;
-  return res.status(201).json(result);
+  return res.status(200).json(result);
 }
 
 async function meProfileRoute(req, res, next) {

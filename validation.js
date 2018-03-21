@@ -2,6 +2,7 @@ const users = require('./users');
 const { query } = require('./db');
 
 const invalidField = s => s !== undefined && typeof s !== 'string';
+const isEmpty = s => s != null && !s;
 
 async function validateUser({ username, password, name }, patch = false) {
   const validationMessages = [];
@@ -34,7 +35,7 @@ async function validateUser({ username, password, name }, patch = false) {
     }
   }
 
-  if (!patch || name) {
+  if (!patch || name || isEmpty(name)) {
     if (typeof name !== 'string' || name.length === 0) {
       validationMessages.push({
         field: 'name',
@@ -59,7 +60,7 @@ async function validateBook({
 } = {}, id = null, patch = false) {
   const messages = [];
 
-  if (!patch || title) {
+  if (!patch || title || isEmpty(title)) {
     if ((typeof title !== 'string' || title.length === 0)) {
       messages.push({
         field: 'title',
@@ -68,7 +69,7 @@ async function validateBook({
     }
   }
 
-  if (!patch || title) {
+  if (!patch || title || isEmpty(title)) {
     const book = await query('SELECT * FROM books WHERE title = $1', [title]);
 
     // leyfum að uppfæra titil í sama titil
@@ -77,7 +78,7 @@ async function validateBook({
     }
   }
 
-  if (!patch || isbn13) {
+  if (!patch || isbn13 || isEmpty(isbn13)) {
     if (!/^[0-9]{13}$/.test(isbn13)) {
       messages.push({ field: 'isbn13', message: 'ISBN-13 value is invalid' });
     }
@@ -90,7 +91,7 @@ async function validateBook({
     }
   }
 
-  if (!patch || category) {
+  if (!patch || category || isEmpty(category)) {
     const catExists = await query('SELECT * FROM categories WHERE id = $1', [category]);
     if (catExists.rows.length === 0) {
       messages.push({ field: 'category', message: `Category with id "${category}" does not exist` });

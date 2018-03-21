@@ -72,14 +72,14 @@ async function registerRoute(req, res) {
   const validationMessage = await validateUser({ username, password, name });
 
   if (validationMessage.length > 0) {
-    res.status(400).json({ errors: validationMessage });
+    return res.status(400).json({ errors: validationMessage });
   }
 
   const result = await users.createUser(username, password, name);
 
   delete result.password;
 
-  res.status(201).json(result);
+  return res.status(201).json(result);
 }
 
 async function loginRoute(req, res) {

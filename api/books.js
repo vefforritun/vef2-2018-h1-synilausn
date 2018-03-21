@@ -88,6 +88,10 @@ async function booksPostRoute(req, res) {
 async function bookRoute(req, res) {
   const { id } = req.params;
 
+  if (Number.isNaN(Number(id))) {
+    return res.status(404).json({ error: 'Book not found' });
+  }
+
   const book = await query('SELECT * FROM books WHERE id = $1', [id]);
 
   if (book.rows.length === 0) {
