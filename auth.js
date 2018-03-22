@@ -97,7 +97,14 @@ async function loginRoute(req, res) {
     const payload = { id: user.id };
     const tokenOptions = { expiresIn: tokenLifetime };
     const token = jwt.sign(payload, jwtOptions.secretOrKey, tokenOptions);
-    return res.json({ token, expiresIn: tokenLifetime });
+
+    delete user.password;
+
+    return res.json({
+      user,
+      token,
+      expiresIn: tokenLifetime,
+    });
   }
 
   return res.status(401).json({ error: 'Invalid password!' });
