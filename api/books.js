@@ -49,9 +49,9 @@ async function booksRoute(req, res) {
     q = `
       SELECT * FROM books
       WHERE
-        to_tsvector('english', title) @@ to_tsquery('english', $1)
+        to_tsvector('english', title) @@ plainto_tsquery('english', $1)
         OR
-        to_tsvector('english', description) @@ to_tsquery('english', $1)
+        to_tsvector('english', description) @@ plainto_tsquery('english', $1)
       ORDER BY title ASC
     `;
     values.push(search);
