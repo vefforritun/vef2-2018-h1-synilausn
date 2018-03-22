@@ -3,8 +3,8 @@ const { paged, query, conditionalUpdate } = require('../db');
 const { validateBook } = require('../validation');
 
 async function categoriesRoute(req, res) {
-  const { offset = 0 } = req.query;
-  const categories = await paged('SELECT * FROM categories', { offset });
+  const { offset = 0, limit = 10 } = req.query;
+  const categories = await paged('SELECT * FROM categories', { offset, limit });
 
   return res.json(categories);
 }
@@ -33,9 +33,15 @@ async function categoriesPostRoute(req, res) {
 }
 
 async function booksRoute(req, res) {
-  const { offset = 0, search = '' } = req.query;
+  const { offset = 0, limit = 10, search = '' } = req.query;
 
-  let q = 'SELECT * FROM books ORDER BY title ASC';
+  let q = `
+    SELECT
+      books.*, categories.title AS categoryTitle
+    FROM books
+    LEFT JOIN categories ON books.category = categories.id
+    ORDER BY title ASC
+  `;
   const values = [];
 
   if (typeof search === 'string' && search !== '') {
@@ -50,7 +56,7 @@ async function booksRoute(req, res) {
     values.push(search);
   }
 
-  const books = await paged(q, { offset, values });
+  const books = await paged(q, { offset, limit, values });
 
   return res.json(books);
 }
@@ -92,7 +98,13 @@ async function bookRoute(req, res) {
     return res.status(404).json({ error: 'Book not found' });
   }
 
-  const book = await query('SELECT * FROM books WHERE id = $1', [id]);
+  const book = await query(`
+    SELECT
+      books.*, categories.title AS categoryTitle
+    FROM books
+    LEFT JOIN categories ON books.category = categories.id
+    WHERE books.id = $1
+  `, [id]);
 
   if (book.rows.length === 0) {
     return res.status(404).json({ error: 'Book not found' });
