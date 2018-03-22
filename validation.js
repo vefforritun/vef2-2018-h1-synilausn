@@ -92,9 +92,15 @@ async function validateBook({
   }
 
   if (!patch || category || isEmpty(category)) {
-    const catExists = await query('SELECT * FROM categories WHERE id = $1', [category]);
-    if (catExists.rows.length === 0) {
-      messages.push({ field: 'category', message: `Category with id "${category}" does not exist` });
+    const err = { field: 'category', message: `Category with id "${category}" does not exist` };
+
+    if (!Number.isInteger(Number(category))) {
+      messages.push(err);
+    } else {
+      const catExists = await query('SELECT * FROM categories WHERE id = $1', [category]);
+      if (catExists.rows.length === 0) {
+        messages.push(err);
+      }
     }
   }
 
@@ -124,10 +130,10 @@ async function validateBook({
   }
 
   if (pageCount) {
-    if (!(Number(pageCount) && Number(pageCount) > 0)) {
+    if (!(Number.isInteger(Number(pageCount)) && Number(pageCount) > 0)) {
       messages.push({
         field: 'pageCount',
-        message: 'pageCount must be a number larger than 0',
+        message: 'pageCount must be an integer larger than 0',
       });
     }
   }
@@ -138,8 +144,8 @@ async function validateBook({
 async function validateRead({ bookId, rating, review }) {
   const messages = [];
 
-  if (!bookId || typeof bookId !== 'number') {
-    messages.push({ field: 'bookId', message: 'Book is required and must be a number' });
+  if (!bookId || !Number.isInteger(Number(bookId))) {
+    messages.push({ field: 'bookId', message: 'Book is required and must be an integer' });
   } else {
     const book = await query('SELECT * FROM books WHERE id = $1', [bookId]);
 

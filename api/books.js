@@ -95,7 +95,7 @@ async function booksPostRoute(req, res) {
 async function bookRoute(req, res) {
   const { id } = req.params;
 
-  if (!Number.isInteger(id)) {
+  if (!Number.isInteger(Number(id))) {
     return res.status(404).json({ error: 'Book not found' });
   }
 
@@ -117,7 +117,7 @@ async function bookRoute(req, res) {
 async function bookPatchRoute(req, res) {
   const { id } = req.params;
 
-  if (!Number.isInteger(id)) {
+  if (!Number.isInteger(Number(id))) {
     return res.status(404).json({ error: 'Book not found' });
   }
 

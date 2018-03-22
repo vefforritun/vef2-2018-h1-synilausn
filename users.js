@@ -21,7 +21,7 @@ async function findByUsername(username) {
 }
 
 async function findById(id) {
-  if (!Number.isInteger(id)) {
+  if (!Number.isInteger(Number(id))) {
     return null;
   }
 
@@ -52,7 +52,7 @@ async function createUser(username, password, name) {
 }
 
 async function updateUser(id, password, name) {
-  if (!Number.isInteger(id)) {
+  if (!Number.isInteger(Number(id))) {
     return null;
   }
 
