@@ -21,6 +21,10 @@ async function findByUsername(username) {
 }
 
 async function findById(id) {
+  if (!Number.isInteger(id)) {
+    return null;
+  }
+
   const q = 'SELECT * FROM users WHERE id = $1';
 
   const result = await query(q, [id]);
@@ -48,6 +52,10 @@ async function createUser(username, password, name) {
 }
 
 async function updateUser(id, password, name) {
+  if (!Number.isInteger(id)) {
+    return null;
+  }
+
   const isset = f => typeof f === 'string' || typeof f === 'number';
 
   const fields = [

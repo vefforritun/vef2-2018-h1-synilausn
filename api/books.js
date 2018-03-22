@@ -4,6 +4,7 @@ const { validateBook } = require('../validation');
 
 async function categoriesRoute(req, res) {
   const { offset = 0, limit = 10 } = req.query;
+
   const categories = await paged('SELECT * FROM categories', { offset, limit });
 
   return res.json(categories);
@@ -94,7 +95,7 @@ async function booksPostRoute(req, res) {
 async function bookRoute(req, res) {
   const { id } = req.params;
 
-  if (Number.isNaN(Number(id))) {
+  if (!Number.isInteger(id)) {
     return res.status(404).json({ error: 'Book not found' });
   }
 
@@ -115,6 +116,10 @@ async function bookRoute(req, res) {
 
 async function bookPatchRoute(req, res) {
   const { id } = req.params;
+
+  if (!Number.isInteger(id)) {
+    return res.status(404).json({ error: 'Book not found' });
+  }
 
   const book = await query('SELECT * FROM books WHERE id = $1', [id]);
 

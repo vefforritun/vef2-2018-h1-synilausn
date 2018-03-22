@@ -24,16 +24,19 @@ async function paged(sqlQuery, { offset = 0, limit = 10, values = [] }) {
   const sqlOffset = values.length + 2;
   const pagedQuery = `${sqlQuery} LIMIT $${sqlLimit} OFFSET $${sqlOffset}`;
 
-  const limitAsNumber = !Number.isNaN(limit) ? limit : 10;
-  const offsetAsNumber = !Number.isNaN(offset) ? offset : 10;
+  const limitAsNumber = Number(limit);
+  const offsetAsNumber = Number(offset);
 
-  const combinedValues = values.concat([limitAsNumber, offsetAsNumber]);
+  const cleanLimit = Number.isInteger(limitAsNumber)  && limitAsNumber > 0 ? limitAsNumber : 10;
+  const cleanOffset = Number.isInteger(offsetAsNumber) && offsetAsNumber > 0 ? offsetAsNumber : 0;
+
+  const combinedValues = values.concat([cleanLimit, cleanOffset]);
 
   const result = await query(pagedQuery, combinedValues);
 
   return {
-    limit,
-    offset,
+    limit: cleanLimit,
+    offset: cleanOffset,
     items: result.rows,
   };
 }
