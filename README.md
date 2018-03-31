@@ -2,7 +2,7 @@
 
 ## Skipulag á verkefni
 
-* `app.js` er inngangspunkut í verkefni og tengir auðkenningu og API
+* `app.js` er inngangspunktur í verkefni og tengir auðkenningu og API
 * `auth.js`
   - Stillir auðkenningu og exportar _subapp_ sem megin app notar
   - Exportar middleware sem krefst auðkenningar og setur `req.user`
