@@ -1,9 +1,9 @@
 
 CREATE TABLE users (
   id serial primary key,
-  username character varying(255) NOT NULL UNIQUE,
+  username character varying(32) NOT NULL UNIQUE,
   password character varying(255) NOT NULL,
-  name character varying(255) NOT NULL,
+  name character varying(64) NOT NULL,
   image character varying(255)
 );
 

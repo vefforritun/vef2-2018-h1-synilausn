@@ -27,7 +27,7 @@ async function paged(sqlQuery, { offset = 0, limit = 10, values = [] }) {
   const limitAsNumber = Number(limit);
   const offsetAsNumber = Number(offset);
 
-  const cleanLimit = Number.isInteger(limitAsNumber)  && limitAsNumber > 0 ? limitAsNumber : 10;
+  const cleanLimit = Number.isInteger(limitAsNumber) && limitAsNumber > 0 ? limitAsNumber : 10;
   const cleanOffset = Number.isInteger(offsetAsNumber) && offsetAsNumber > 0 ? offsetAsNumber : 0;
 
   const combinedValues = values.concat([cleanLimit, cleanOffset]);

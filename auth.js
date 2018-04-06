@@ -54,7 +54,7 @@ function requireAuth(req, res, next) {
       }
 
       if (!user) {
-        const error = info.name === 'TokenExpiredError' ?
+        const error = info && info.name === 'TokenExpiredError' ?
           'expired token' : 'invalid token';
 
         return res.status(401).json({ error });

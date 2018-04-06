@@ -13,9 +13,10 @@ async function categoriesRoute(req, res) {
 async function categoriesPostRoute(req, res) {
   const { title } = req.body;
 
-  if (typeof title !== 'string' || title.length === 0) {
+  if (typeof title !== 'string' || title.length === 0 || title.length > 255) {
+    const message = 'Title is required, must not be empty or longar than 255 characters';
     return res.status(400).json({
-      errors: [{ field: 'title', message: 'Title is required and must not be empty' }],
+      errors: [{ field: 'title', message }],
     });
   }
 

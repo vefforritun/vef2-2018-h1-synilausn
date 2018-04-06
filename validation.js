@@ -1,7 +1,17 @@
 const users = require('./users');
 const { query } = require('./db');
 
-const invalidField = s => s !== undefined && typeof s !== 'string';
+const invalidField = (s, maxlen) => {
+  if (s !== undefined && typeof s !== 'string') {
+    return true;
+  }
+
+  if (maxlen) {
+    return s.length > maxlen;
+  }
+
+  return false;
+};
 const isEmpty = s => s != null && !s;
 
 async function validateUser({ username, password, name }, patch = false) {
@@ -9,11 +19,9 @@ async function validateUser({ username, password, name }, patch = false) {
 
   // can't patch username
   if (!patch) {
-    if (typeof username !== 'string' || username.length < 3) {
-      validationMessages.push({
-        field: 'username',
-        message: 'Username is required and must be at least three letters',
-      });
+    const m = 'Username is required, must be at least three letters and no more than 32 characters';
+    if (typeof username !== 'string' || username.length < 3 || username.length > 32) {
+      validationMessages.push({ field: 'username', message: m });
     }
 
     const user = await users.findByUsername(username);
@@ -26,7 +34,7 @@ async function validateUser({ username, password, name }, patch = false) {
     }
   }
 
-  if (!patch || password) {
+  if (!patch || password || isEmpty(password)) {
     if (typeof password !== 'string' || password.length < 6) {
       validationMessages.push({
         field: 'password',
@@ -36,10 +44,10 @@ async function validateUser({ username, password, name }, patch = false) {
   }
 
   if (!patch || name || isEmpty(name)) {
-    if (typeof name !== 'string' || name.length === 0) {
+    if (typeof name !== 'string' || name.length === 0 || name.length > 64) {
       validationMessages.push({
         field: 'name',
-        message: 'Name is required and must not be empty',
+        message: 'Name is required, must not be empty or longar than 64 characters',
       });
     }
   }
@@ -61,10 +69,10 @@ async function validateBook({
   const messages = [];
 
   if (!patch || title || isEmpty(title)) {
-    if ((typeof title !== 'string' || title.length === 0)) {
+    if ((typeof title !== 'string' || title.length === 0 || title.length > 255)) {
       messages.push({
         field: 'title',
-        message: 'Title is required and must not be empty',
+        message: 'Title is required and must not be empty and no longer than 255 characters',
       });
     }
   }
@@ -97,15 +105,16 @@ async function validateBook({
     if (!Number.isInteger(Number(category))) {
       messages.push(err);
     } else {
-      const catExists = await query('SELECT * FROM categories WHERE id = $1', [category]);
+      const catExists = await query('SELECT * FROM categories WHERE id = $1', [Number(category)]);
       if (catExists.rows.length === 0) {
         messages.push(err);
       }
     }
   }
 
-  if (invalidField(language)) {
-    messages.push({ field: 'language', message: 'Language must be a string' });
+  // doesn't handle multibyte string
+  if (language !== undefined && (typeof language !== 'string' || language.length !== 2)) {
+    messages.push({ field: 'language', message: 'Language must be a string of length 2' });
   }
 
   if (invalidField(author)) {
@@ -116,8 +125,9 @@ async function validateBook({
     messages.push({ field: 'description', message: 'Description must be a string' });
   }
 
-  if (invalidField(published)) {
-    messages.push({ field: 'published', message: 'Published must be a string' });
+  if (invalidField(published, 10)) {
+    const message = 'Published must be a string, no more than 10 characters';
+    messages.push({ field: 'published', message });
   }
 
   if (isbn10) {
@@ -130,6 +140,13 @@ async function validateBook({
   }
 
   if (pageCount) {
+    if (pageCount.length > 10) {
+      messages.push({
+        field: 'pageCount',
+        message: 'pageCount must be an integer smaller than 10000000000',
+      });
+    }
+
     if (!(Number.isInteger(Number(pageCount)) && Number(pageCount) > 0)) {
       messages.push({
         field: 'pageCount',
