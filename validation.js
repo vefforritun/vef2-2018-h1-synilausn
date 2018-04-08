@@ -6,7 +6,7 @@ const invalidField = (s, maxlen) => {
     return true;
   }
 
-  if (maxlen) {
+  if (maxlen && s && s.length) {
     return s.length > maxlen;
   }
 
@@ -100,7 +100,9 @@ async function validateBook({
   }
 
   if (!patch || category || isEmpty(category)) {
-    const err = { field: 'category', message: `Category with id "${category}" does not exist` };
+    const message = category == null ?
+      'Category does not exist' : `Category with id "${category}" does not exist`;
+    const err = { field: 'category', message };
 
     if (!Number.isInteger(Number(category))) {
       messages.push(err);
@@ -113,7 +115,8 @@ async function validateBook({
   }
 
   // doesn't handle multibyte string
-  if (language !== undefined && (typeof language !== 'string' || language.length !== 2)) {
+  if (language !== undefined &&
+      (typeof language !== 'string' || (language.length !== 2 && language.length !== 0))) {
     messages.push({ field: 'language', message: 'Language must be a string of length 2' });
   }
 
