@@ -13,7 +13,11 @@ async function userReadRoute(req, res) {
     return res.status(404).json({ error: 'User not found' });
   }
 
-  const read = await paged('SELECT * FROM read_books WHERE user_id = $1', { offset, values: [id] });
+  const read = await paged(`
+    SELECT read_books.*, books.title
+    FROM read_books
+    LEFT JOIN books ON read_books.book_id = books.id
+    WHERE user_id = $1`, { offset, values: [id] });
 
   return res.json(read);
 }
@@ -28,7 +32,11 @@ async function meReadRoute(req, res) {
     return res.status(404).json({ error: 'You not found' });
   }
 
-  const read = await paged('SELECT * FROM read_books WHERE user_id = $1', { offset, values: [id] });
+  const read = await paged(`
+    SELECT read_books.*, books.title
+    FROM read_books
+    LEFT JOIN books ON read_books.book_id = books.id
+    WHERE user_id = $1`, { offset, values: [id] });
 
   return res.json(read);
 }
