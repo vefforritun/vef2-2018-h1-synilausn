@@ -49,11 +49,13 @@ async function importBook(row, categories) {
   const pageCount = parseInt(row.pagecount, 10);
   const pageCountValue = Number.isNaN(pageCount) ? null : pageCount;
 
+  const isbn10 = String(row.isbn10).length === 9 ? `0${row.isbn10}` : row.isbn10;
+
   const values = [
     row.title,
     row.author,
     row.description,
-    row.isbn10,
+    isbn10,
     row.isbn13,
     row.published,
     pageCountValue,
