@@ -19,7 +19,7 @@ CREATE TABLE books (
   description text NOT NULL,
   isbn10 character varying(10),
   isbn13 character varying(13) NOT NULL UNIQUE,
-  category serial references categories(id),
+  category integer references categories(id),
 
   published character varying(10),
   pageCount character varying(10),
@@ -28,8 +28,8 @@ CREATE TABLE books (
 
 CREATE TABLE read_books (
   id serial primary key,
-  book_id serial references books(id),
-  user_id serial references users(id),
+  book_id integer references books(id),
+  user_id integer references users(id),
   rating integer,
   review text
 );
